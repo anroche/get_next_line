@@ -1,0 +1,57 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anroche <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/02/03 14:51:41 by anroche           #+#    #+#             */
+/*   Updated: 2017/02/07 15:13:44 by anroche          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "get_next_line.h"
+#include "libft/libft.h"
+#include <stdio.h>
+
+char	*ft_check(int fd)
+{
+	char	*ret;
+	char	*buffer;
+	ret = NULL;
+	buffer = ft_strnew(BUFF_SIZE);
+	while ((read(fd, buffer, BUFF_SIZE)) && !ft_memchr(buffer, '\n', BUFF_SIZE))
+		ret = ft_strconcat(ret, buffer);
+	if (!ft_memchr(buffer, '\n', BUFF_SIZE))
+		return (ret);
+	ret = ft_strconcat(ret, buffer);
+	free(buffer);
+	return (ret);
+}
+
+int		get_next_line(const int fd, char **line)
+{
+	int				i;
+	char			*src;
+	char			*buffer;
+	static char		*stock;
+
+	i = 0;
+	buffer = NULL;
+	src = NULL;
+	if (read(fd, buffer, 0) == -1 || fd == -1 || !line)
+		return (-1);
+	src = ft_strconcat(stock, ft_check(fd));
+	if ((ft_memchr(src, '\n', ft_strlen(src))))
+	{
+		while (src[i] != '\n')
+			i++;
+		*line = ft_strsub(src, 0, i);
+		stock = ft_strsub(src, i + 1, ft_strlen(src));
+		return (1);
+	}
+	*line = src;
+	stock = NULL;
+	return (((*line)[0] != '\0') ? 1 : 0);
+	return (0);
+}
